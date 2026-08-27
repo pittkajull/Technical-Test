@@ -17,12 +17,9 @@ PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beb
 
 | Username | Password | Nama | Role |
 |----------|----------|------|------|
-| `admin` | `password` | Setiawan Budiman | Admin |
-| `fleet_mgr` | `password` | Rudi Hartono | Fleet Manager |
-| `approver1` | `password` | Ir. Bambang Sutrisno | Approver Level 1 |
-| `approver2` | `password` | Ir. Dewi Kartika | Approver Level 2 |
-| `approver3` | `password` | Drh. Agus Prasetyo | Approver Level 1 |
-| `approver4` | `password` | Siti Nurhaliza | Approver Level 2 |
+| `admin` | `password` | Administrator | Admin |
+| `approver1` | `password` | Budi Santoso | Approver Level 1 |
+| `approver2` | `password` | Siti Rahayu | Approver Level 2 |
 
 ---
 
@@ -30,7 +27,7 @@ PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beb
 
 | Komponen | Versi |
 |----------|-------|
-| **PHP** | 8.1+ |
+| **PHP** | 8.2+ |
 | **Database** | SQLite3 (built-in) |
 | **Framework** | CodeIgniter 4.7.4 |
 | **Frontend** | Bootstrap 5.3.2 |
@@ -83,12 +80,12 @@ php spark serve --port 8080
 - Status otomatis berjenjang
 
 ### 3. Persetujuan Berjenjang
-- Level 1: Ir. Bambang Sutrisno / Drh. Agus Prasetyo
-- Level 2: Ir. Dewi Kartika / Siti Nurhaliza
+- Level 1: Budi Santoso
+- Level 2: Siti Rahayu
 - Catatan pada setiap persetujuan
 
 ### 4. Manajemen Kendaraan
-- 25 kendaraan (21 milik perusahaan + 4 sewa)
+- 10 kendaraan (6 milik perusahaan + 4 sewa)
 - Log pengisian BBM
 - Log service kendaraan
 
@@ -105,12 +102,12 @@ php spark serve --port 8080
 
 | Data | Jumlah | Keterangan |
 |------|--------|------------|
-| Users | 6 | 2 admin, 4 approver |
+| Users | 3 | 1 admin, 2 approver (Level 1 & 2) |
 | Lokasi | 8 | 1 pusat, 1 cabang, 6 tambang |
-| Jenis Kendaraan | 7 | Bus, Pickup, Dump Truck, SUV, Motor, Tanker, Crane |
-| Driver | 10 | SIM A, B1, B2, C |
-| Kendaraan | 25 | 21 milik perusahaan + 4 sewa |
-| Bookings | 14 | 9 completed, 2 approved, 3 pending |
+| Jenis Kendaraan | 5 | Bus Mini, Pickup, Dump Truck, SUV, Motor |
+| Driver | 5 | SIM A, B1, B2, C |
+| Kendaraan | 10 | 6 milik perusahaan + 4 sewa |
+| Bookings | 7 | 3 completed, 2 approved, 2 pending |
 
 ---
 
@@ -119,16 +116,21 @@ php spark serve --port 8080
 ```
 fleet-booking/
 ├── app/
-│   ├── Controllers/     (7 controllers)
+│   ├── Config/          (45 config files + Boot/)
+│   ├── Controllers/     (9 controllers)
 │   ├── Models/          (10 models)
-│   └── Views/           (12 views)
+│   ├── Views/           (12 view templates)
+│   └── Database/        (Migrations & Seeds)
 ├── writable/
 │   └── fleet_booking.db (SQLite database)
 ├── public/
+│   ├── index.php        (Entry point)
 │   ├── setup_db.php     (Database setup)
 │   └── router.php       (PHP built-in server router)
-├── README.md
-└── .env
+├── tests/               (PHPUnit tests)
+├── fleet_booking.sql    (SQL dump reference)
+├── composer.json
+└── README.md
 ```
 
 ---
