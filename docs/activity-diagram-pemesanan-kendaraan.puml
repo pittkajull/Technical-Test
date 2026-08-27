@@ -1,0 +1,210 @@
+@startuml Activity Diagram - Pemesanan Kendaraan
+
+title Activity Diagram - Fitur Pemesanan Kendaraan\nPT Nikel Sejahtera Mining
+
+|#LightBlue| Admin |
+|#LightGreen| Approver L1 |
+|#LightYellow| Approver L2 |
+|#White| Sistem |
+
+|Admin|
+start
+:Login ke aplikasi;
+:Menuju halaman Dashboard;
+
+|Sistem|
+:Menampilkan data dashboard
+(total kendaraan, driver, booking,
+grafik pemakaian BBM);
+
+|Admin|
+:Klik menu "Pemesanan";
+:Klik tombol "Pemesanan Baru";
+
+|Sistem|
+:Menampilkan form pemesanan
+(daftar kendaraan tersedia,
+daftar driver aktif,
+daftar approver);
+
+|Admin|
+:Isi form pemesanan:
+- Pilih kendaraan
+- Pilih driver
+- Pilih Approver Level 1
+- Pilih Approver Level 2
+- Isi keperluan
+- Isi asal & tujuan
+- Isi tanggal & waktu berangkat
+- Isi perkiraan tanggal kembali;
+
+:Klik tombol "Simpan";
+
+|Sistem|
+:Validasi input form;
+
+if (Input valid?) then (Tidak)
+  :Tampilkan pesan error
+  (field wajib harus diisi);
+  stop
+else (Ya)
+endif
+
+:Cek ketersediaan kendaraan;
+
+if (Kendaraan tersedia?) then (Tidak)
+  :Tampilkan pesan error
+  "Kendaraan tidak tersedia";
+  stop
+else (Ya)
+endif
+
+:Cek apakah Approver L1 dan L2
+berbeda orang;
+
+if (Approver berbeda?) then (Tidak)
+  :Tampilkan pesan error
+  "Approver harus dari orang yang berbeda";
+  stop
+else (Ya)
+endif
+
+:Buat kode pemesanan unik
+(format: BK-YYYYMMDD-XXX);
+:Simpan data pemesanan
+(status: pending);
+
+:Buat 2 record persetujuan
+(Level 1 & Level 2, status: pending);
+
+:Update status kendaraan
+"tersedia" → "dalam_perjalanan";
+
+:Catat log aktivitas
+(CREATE_BOOKING);
+
+:Redirect ke daftar pemesanan
++tampilkan pesan sukses;
+
+|Approver L1|
+:Login ke aplikasi;
+:Menuju halaman "Persetujuan";
+:Menampilkan daftar pemesanan
+yang menunggu persetujuan L1;
+
+:Klik pemesanan yang akan disetujui;
+:Menampilkan detail pemesanan
++ status persetujuan;
+
+if (Setuju atau Tolak?) then (Tolak)
+  :Isi catatan penolakan;
+  :Klik tombol "Tolak";
+  
+  |Sistem|
+  :Update status persetujuan L1
+  "pending" → "rejected";
+  :Update status pemesanan
+  "pending" → "rejected";
+  :Update status kendaraan
+  "dalam_perjalanan" → "tersedia";
+  :Catat log aktivitas
+  (REJECT_BOOKING);
+  
+  :Notifikasi pemesanan ditolak;
+
+  |Admin|
+  :Menerima notifikasi
+  pemesanan ditolak;
+  stop
+
+else (Setuju)
+  :Isi catatan persetujuan;
+  :Klik tombol "Setuju";
+  
+  |Sistem|
+  :Update status persetujuan L1
+  "pending" → "approved";
+  :Update status pemesanan
+  "pending" → "approved_level1";
+  :Catat log aktivitas
+  (APPROVE_BOOKING_L1);
+  
+  :Notifikasi pemesanan disetujui L1
+  → menunggu persetujuan L2;
+endif
+
+|Approver L2|
+:Login ke aplikasi;
+:Menuju halaman "Persetujuan";
+:Menampilkan daftar pemesanan
+dengan status "approved_level1"
+yang menunggu persetujuan L2;
+
+:Klik pemesanan yang akan disetujui;
+:Menampilkan detail pemesanan
++ status persetujuan (L1 sudah disetujui);
+
+if (Setuju atau Tolak?) then (Tolak)
+  :Isi catatan penolakan;
+  :Klik tombol "Tolak";
+  
+  |Sistem|
+  :Update status persetujuan L2
+  "pending" → "rejected";
+  :Update status pemesanan
+  "approved_level1" → "rejected";
+  :Update status kendaraan
+  "dalam_perjalanan" → "tersedia";
+  :Catat log aktivitas
+  (REJECT_BOOKING);
+  
+  :Notifikasi pemesanan ditolak;
+
+  |Admin|
+  :Menerima notifikasi
+  pemesanan ditolak;
+  stop
+
+else (Setuju)
+  :Isi catatan persetujuan;
+  :Klik tombol "Setuju";
+  
+  |Sistem|
+  :Update status persetujuan L2
+  "pending" → "approved";
+  :Update status pemesanan
+  "approved_level1" → "approved_level2";
+  :Catat log aktivitas
+  (APPROVE_BOOKING_L2);
+  
+  :Pemesanan disetujui penuh
+  (L1 & L2 approved);
+endif
+
+|Admin|
+:Klik menu "Kendaraan"
+untuk melihat detail kendaraan;
+:Melihat log BBM & service kendaraan;
+
+:Menuju halaman "Laporan";
+:Filter data per periode tanggal;
+:Klik tombol "Export Excel/CSV";
+
+|Sistem|
+:Generate file laporan
+(CSV/Excel);
+:Catat log aktivitas
+(EXPORT_REPORT);
+:Download file ke komputer admin;
+
+|Admin|
+:Menerima file laporan;
+
+|Sistem|
+:Menampilkan dashboard
+dengan grafik terbaru
+(pemesanan, status, jenis kendaraan, BBM);
+
+stop
+
+@enduml
