@@ -1,191 +1,201 @@
 -- =====================================================
--- DATABASE: fleet_booking
+-- DATABASE: fleet_booking (SQLite3)
 -- Sistem Pemesanan Kendaraan Perusahaan Tambang Nikel
 -- =====================================================
-
-CREATE DATABASE IF NOT EXISTS fleet_booking CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE fleet_booking;
+-- Format: SQLite3 - compatible dengan project ini
+-- Untuk import: sqlite3 writable/fleet_booking.db < fleet_booking.sql
+-- =====================================================
 
 -- =====================================================
 -- TABEL USERS (Admin & Approver)
 -- =====================================================
-CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    fullname VARCHAR(100) NOT NULL,
-    email VARCHAR(100),
-    role ENUM('admin', 'approver_level1', 'approver_level2') NOT NULL DEFAULT 'admin',
-    is_active TINYINT(1) DEFAULT 1,
-    last_login DATETIME NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    fullname TEXT NOT NULL,
+    email TEXT,
+    role TEXT NOT NULL DEFAULT 'admin'
+        CHECK (role IN ('admin', 'approver_level1', 'approver_level2')),
+    is_active INTEGER DEFAULT 1,
+    last_login TEXT,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
+    updated_at TEXT DEFAULT (datetime('now', 'localtime'))
+);
 
 -- =====================================================
 -- TABEL LOCATIONS (Kantor Pusat, Kantor Cabang, Tambang)
 -- =====================================================
-CREATE TABLE locations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    type ENUM('kantor_pusat', 'kantor_cabang', 'tambang') NOT NULL,
+CREATE TABLE IF NOT EXISTS locations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL
+        CHECK (type IN ('kantor_pusat', 'kantor_cabang', 'tambang')),
     address TEXT,
-    latitude DECIMAL(10, 8) NULL,
-    longitude DECIMAL(11, 8) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+    latitude REAL,
+    longitude REAL,
+    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+);
 
 -- =====================================================
 -- TABEL VEHICLE_TYPES (Jenis Kendaraan)
 -- =====================================================
-CREATE TABLE vehicle_types (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    description VARCHAR(100)
-) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS vehicle_types (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT
+);
 
 -- =====================================================
 -- TABEL VEHICLES (Data Kendaraan)
 -- =====================================================
-CREATE TABLE vehicles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    plate_number VARCHAR(20) NOT NULL UNIQUE,
-    vehicle_type_id INT NOT NULL,
-    brand VARCHAR(50),
-    model VARCHAR(50),
-    year INT,
-    color VARCHAR(30),
-    ownership ENUM('milik_perusahaan', 'sewa') NOT NULL DEFAULT 'milik_perusahaan',
-    rental_company VARCHAR(100) NULL COMMENT 'Nama perusahaan persewaan jika kendaraan disewa',
-    fuel_type ENUM('pertalite', 'pertamax', 'solar', 'dex') NOT NULL DEFAULT 'solar',
-    status ENUM('tersedia', 'dalam_perjalanan', 'service', 'tidak_aktif') DEFAULT 'tersedia',
-    current_mileage INT DEFAULT 0,
-    location_id INT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS vehicles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    plate_number TEXT NOT NULL UNIQUE,
+    vehicle_type_id INTEGER NOT NULL,
+    brand TEXT,
+    model TEXT,
+    year INTEGER,
+    color TEXT,
+    ownership TEXT NOT NULL DEFAULT 'milik_perusahaan'
+        CHECK (ownership IN ('milik_perusahaan', 'sewa')),
+    rental_company TEXT,
+    fuel_type TEXT NOT NULL DEFAULT 'solar'
+        CHECK (fuel_type IN ('pertalite', 'pertamax', 'solar', 'dex')),
+    status TEXT DEFAULT 'tersedia'
+        CHECK (status IN ('tersedia', 'dalam_perjalanan', 'service', 'tidak_aktif')),
+    current_mileage INTEGER DEFAULT 0,
+    location_id INTEGER,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
+    updated_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (vehicle_type_id) REFERENCES vehicle_types(id),
     FOREIGN KEY (location_id) REFERENCES locations(id)
-) ENGINE=InnoDB;
+);
 
 -- =====================================================
 -- TABEL DRIVERS (Data Driver)
 -- =====================================================
-CREATE TABLE drivers (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    phone VARCHAR(20),
-    license_number VARCHAR(50),
-    license_type ENUM('A', 'B1', 'B2', 'C', 'D') NOT NULL DEFAULT 'B2',
-    is_active TINYINT(1) DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS drivers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT,
+    license_number TEXT,
+    license_type TEXT NOT NULL DEFAULT 'B2'
+        CHECK (license_type IN ('A', 'B1', 'B2', 'C', 'D')),
+    is_active INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now', 'localtime'))
+);
 
 -- =====================================================
 -- TABEL FUEL_LOGS (Konsumsi BBM)
 -- =====================================================
-CREATE TABLE fuel_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id INT NOT NULL,
-    fuel_date DATE NOT NULL,
-    fuel_type ENUM('pertalite', 'pertamax', 'solar', 'dex') NOT NULL,
-    liters DECIMAL(10, 2) NOT NULL,
-    total_cost DECIMAL(15, 2) NOT NULL,
-    mileage_at_fuel INT COMMENT 'Odometer saat pengisian BBM',
-    station VARCHAR(100),
+CREATE TABLE IF NOT EXISTS fuel_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vehicle_id INTEGER NOT NULL,
+    fuel_date TEXT NOT NULL,
+    fuel_type TEXT NOT NULL
+        CHECK (fuel_type IN ('pertalite', 'pertamax', 'solar', 'dex')),
+    liters REAL NOT NULL,
+    total_cost REAL NOT NULL,
+    mileage_at_fuel INTEGER,
+    station TEXT,
     notes TEXT,
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by INTEGER,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
-) ENGINE=InnoDB;
+);
 
 -- =====================================================
 -- TABEL SERVICE_LOGS (Jadwal & Riwayat Service)
 -- =====================================================
-CREATE TABLE service_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    vehicle_id INT NOT NULL,
-    service_type ENUM('routine', 'repair', 'emergency') NOT NULL DEFAULT 'routine',
-    service_date DATE NOT NULL,
-    next_service_date DATE NULL,
-    next_service_mileage INT NULL,
+CREATE TABLE IF NOT EXISTS service_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    vehicle_id INTEGER NOT NULL,
+    service_type TEXT NOT NULL DEFAULT 'routine'
+        CHECK (service_type IN ('routine', 'repair', 'emergency')),
+    service_date TEXT NOT NULL,
+    next_service_date TEXT,
+    next_service_mileage INTEGER,
     description TEXT NOT NULL,
-    cost DECIMAL(15, 2) DEFAULT 0,
-    workshop VARCHAR(100),
-    mileage_at_service INT,
-    status ENUM('scheduled', 'in_progress', 'completed') DEFAULT 'scheduled',
-    created_by INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cost REAL DEFAULT 0,
+    workshop TEXT,
+    mileage_at_service INTEGER,
+    status TEXT DEFAULT 'scheduled'
+        CHECK (status IN ('scheduled', 'in_progress', 'completed')),
+    created_by INTEGER,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     FOREIGN KEY (created_by) REFERENCES users(id)
-) ENGINE=InnoDB;
+);
 
 -- =====================================================
 -- TABEL BOOKINGS (Pemesanan Kendaraan)
 -- =====================================================
-CREATE TABLE bookings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_code VARCHAR(20) NOT NULL UNIQUE,
-    vehicle_id INT NOT NULL,
-    driver_id INT NOT NULL,
-    requester_id INT NOT NULL COMMENT 'User yang memesan kendaraan',
-    purpose TEXT NOT NULL COMMENT 'Keperluan pemakaian kendaraan',
-    origin VARCHAR(100) NOT NULL,
-    destination VARCHAR(100) NOT NULL,
-    departure_date DATE NOT NULL,
-    departure_time TIME NOT NULL,
-    return_date DATE NULL,
-    return_time TIME NULL,
-    estimated_return_date DATE NULL,
-    estimated_return_time TIME NULL,
-    status ENUM('pending', 'approved_level1', 'approved_level2', 'rejected', 'in_progress', 'completed', 'cancelled') DEFAULT 'pending',
-    rejection_reason TEXT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS bookings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_code TEXT NOT NULL UNIQUE,
+    vehicle_id INTEGER NOT NULL,
+    driver_id INTEGER NOT NULL,
+    requester_id INTEGER NOT NULL,
+    purpose TEXT NOT NULL,
+    origin TEXT NOT NULL,
+    destination TEXT NOT NULL,
+    departure_date TEXT NOT NULL,
+    departure_time TEXT NOT NULL,
+    return_date TEXT,
+    return_time TEXT,
+    estimated_return_date TEXT,
+    estimated_return_time TEXT,
+    status TEXT DEFAULT 'pending'
+        CHECK (status IN ('pending', 'approved_level1', 'approved_level2', 'rejected', 'in_progress', 'completed', 'cancelled')),
+    rejection_reason TEXT,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
+    updated_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id),
     FOREIGN KEY (driver_id) REFERENCES drivers(id),
     FOREIGN KEY (requester_id) REFERENCES users(id)
-) ENGINE=InnoDB;
+);
 
 -- =====================================================
 -- TABEL BOOKING_APPROVALS (Persetujuan Berjenjang)
 -- =====================================================
-CREATE TABLE booking_approvals (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    booking_id INT NOT NULL,
-    approver_id INT NOT NULL COMMENT 'User yang menyetujui',
-    approval_level INT NOT NULL COMMENT 'Level persetujuan (1 atau 2)',
-    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-    notes TEXT NULL,
-    approved_at DATETIME NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CREATE TABLE IF NOT EXISTS booking_approvals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    booking_id INTEGER NOT NULL,
+    approver_id INTEGER NOT NULL,
+    approval_level INTEGER NOT NULL,
+    status TEXT DEFAULT 'pending'
+        CHECK (status IN ('pending', 'approved', 'rejected')),
+    notes TEXT,
+    approved_at TEXT,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,
     FOREIGN KEY (approver_id) REFERENCES users(id)
-) ENGINE=InnoDB;
+);
 
 -- =====================================================
 -- TABEL APPLICATION_LOGS (Log Aktivitas)
 -- =====================================================
-CREATE TABLE application_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NULL,
-    action VARCHAR(100) NOT NULL,
+CREATE TABLE IF NOT EXISTS application_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    action TEXT NOT NULL,
     description TEXT NOT NULL,
-    ip_address VARCHAR(45),
+    ip_address TEXT,
     user_agent TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (user_id) REFERENCES users(id)
-) ENGINE=InnoDB;
+);
 
 -- =====================================================
 -- SEED DATA: Users
+-- Password semua user: password (bcrypt hash)
 -- =====================================================
 INSERT INTO users (username, password, fullname, email, role, is_active) VALUES
 ('admin', '$2y$10$5JCx.eB795LNGD8KhbrH4eTbEdCnYNrWp6KsQJJ4MclH6qIEV3Riy', 'Administrator', 'admin@tambang.com', 'admin', 1),
 ('approver1', '$2y$10$5JCx.eB795LNGD8KhbrH4eTbEdCnYNrWp6KsQJJ4MclH6qIEV3Riy', 'Budi Santoso', 'budi@tambang.com', 'approver_level1', 1),
 ('approver2', '$2y$10$5JCx.eB795LNGD8KhbrH4eTbEdCnYNrWp6KsQJJ4MclH6qIEV3Riy', 'Siti Rahayu', 'siti@tambang.com', 'approver_level2', 1);
-
--- Password semua user: password
 
 -- =====================================================
 -- SEED DATA: Locations
