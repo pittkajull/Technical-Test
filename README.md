@@ -4,15 +4,6 @@ Aplikasi web untuk monitoring dan pemesanan kendaraan operasional perusahaan tam
 
 ---
 
-## Tentang Perusahaan
-
-PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beberapa wilayah Indonesia:
-- **Kantor Pusat**: Jakarta Selatan
-- **Kantor Cabang**: Makassar
-- **Tambang**: Morowali, Halmahera Selatan, Wajo, Kolaka Utara, Konawe Utara, Bulukumba
-
----
-
 ## Login Credentials
 
 | Username | Password | Nama | Role |
