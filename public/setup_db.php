@@ -22,7 +22,7 @@ echo "<style>
     .btn:hover { background: #2980b9; }
 </style></head><body><div class='card'>";
 
-echo "<h1>🚛 Database Setup - PT Nikel Sejahtera Mining</h1>";
+echo "<h1>Database Setup - PT Nikel Sejahtera Mining</h1>";
 
 // Cek file SQL
 if (!file_exists($sqlFile)) {
@@ -32,12 +32,12 @@ if (!file_exists($sqlFile)) {
     exit(1);
 }
 
-echo "<p class='info'>📄 Sumber data: <code>fleet_booking.sql</code></p>";
+echo "<p class='info'>Sumber data: <code>fleet_booking.sql</code></p>";
 
 // Hapus database lama jika ada
 if (file_exists($dbPath)) {
     unlink($dbPath);
-    echo "<p>🗑️ Database lama dihapus</p>";
+    echo "<p>Database lama dihapus</p>";
 }
 
 // Buat database baru
@@ -46,7 +46,7 @@ try {
     $db->enableExceptions(true);
     $db->exec('PRAGMA foreign_keys = ON');
     
-    echo "<p>📦 Database baru dibuat: <code>writable/fleet_booking.db</code></p>";
+    echo "<p>Database baru dibuat: <code>writable/fleet_booking.db</code></p>";
     
     // Baca dan eksekusi SQL file
     $sql = file_get_contents($sqlFile);
@@ -79,22 +79,22 @@ try {
         }
     }
     
-    echo "<p class='success'>✅ Import selesai: $successCount statements berhasil, $errorCount errors (normal jika table sudah ada)</p>";
+    echo "<p class='success'>Import selesai: $successCount statements berhasil, $errorCount errors (normal jika table sudah ada)</p>";
     
     // Verifikasi data
-    echo "<hr><h2>📊 Data yang diimport:</h2>";
+    echo "<hr><h2>Data yang diimport:</h2>";
     
     $tables = [
-        'users' => '👤 Users',
-        'locations' => '📍 Lokasi',
-        'vehicle_types' => '🚗 Jenis Kendaraan',
-        'vehicles' => '🚛 Kendaraan',
-        'drivers' => '👨‍✈️ Driver',
-        'fuel_logs' => '⛽ Log BBM',
-        'service_logs' => '🔧 Log Service',
-        'bookings' => '📋 Pemesanan',
-        'booking_approvals' => '✅ Persetujuan',
-        'application_logs' => '📝 Log Aktivitas'
+        'users' => 'Users',
+        'locations' => 'Lokasi',
+        'vehicle_types' => 'Jenis Kendaraan',
+        'vehicles' => 'Kendaraan',
+        'drivers' => 'Driver',
+        'fuel_logs' => 'Log BBM',
+        'service_logs' => 'Log Service',
+        'bookings' => 'Pemesanan',
+        'booking_approvals' => 'Persetujuan',
+        'application_logs' => 'Log Aktivitas'
     ];
     
     echo "<table>";
@@ -107,7 +107,7 @@ try {
     echo "</table>";
     
     // Tampilkan info login
-    echo "<hr><h2>🔐 Login Credentials:</h2>";
+    echo "<hr><h2>Login Credentials:</h2>";
     echo "<table>";
     echo "<tr><th>Username</th><th>Password</th><th>Nama</th><th>Role</th></tr>";
     
@@ -125,7 +125,7 @@ try {
     $db->close();
     
     echo "<hr>";
-    echo "<h2 class='success'>✅ Database Siap Digunakan!</h2>";
+    echo "<h2 class='success'>Database Siap Digunakan!</h2>";
     echo "<p>Semua data sudah diimport dari <code>fleet_booking.sql</code>.</p>";
     echo "<a class='btn' href='../index.php/auth'>→ Buka Aplikasi</a>";
     

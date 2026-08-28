@@ -1,10 +1,10 @@
-# 🚛 PT Nikel Sejahtera Mining - Sistem Pemesanan Kendaraan
+# PT Nikel Sejahtera Mining - Sistem Pemesanan Kendaraan
 
 Aplikasi web untuk monitoring dan pemesanan kendaraan operasional perusahaan tambang nikel. Dibangun dengan CodeIgniter 4, Bootstrap 5, dan SQLite.
 
 ---
 
-## 🏢 Tentang Perusahaan
+## Tentang Perusahaan
 
 PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beberapa wilayah Indonesia:
 - **Kantor Pusat**: Jakarta Selatan
@@ -13,7 +13,7 @@ PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beb
 
 ---
 
-## 🔐 Login Credentials
+## Login Credentials
 
 | Username | Password | Nama | Role |
 |----------|----------|------|------|
@@ -23,7 +23,7 @@ PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beb
 
 ---
 
-## 💻 Spesifikasi Teknis
+## Spesifikasi Teknis
 
 | Komponen | Versi |
 |----------|-------|
@@ -36,7 +36,7 @@ PT Nikel Sejahtera Mining adalah perusahaan tambang nikel yang beroperasi di beb
 
 ---
 
-## 🛠️ Instalasi
+## Instalasi
 
 ### Prasyarat
 - PHP 8.1+ dengan extension: `pdo_sqlite`, `sqlite3`, `mbstring`
@@ -98,7 +98,7 @@ php spark serve --port 8080
 
 ---
 
-## 📊 Data Master
+## Data Master
 
 | Data | Jumlah | Keterangan |
 |------|--------|------------|
@@ -111,7 +111,7 @@ php spark serve --port 8080
 
 ---
 
-## 📁 Struktur
+## Struktur
 
 ```
 fleet-booking/
