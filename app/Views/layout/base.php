@@ -164,9 +164,11 @@
             <a class="nav-link <?= uri_string() === '/dashboard' ? 'active' : '' ?>" href="/dashboard">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
+            <?php if (session()->get('role') === 'admin'): ?>
             <a class="nav-link <?= strpos(uri_string(), '/booking') === 0 ? 'active' : '' ?>" href="/booking">
                 <i class="bi bi-calendar-check"></i> Pemesanan
             </a>
+            <?php endif; ?>
             <?php if (session()->get('role') !== 'admin'): ?>
             <a class="nav-link <?= strpos(uri_string(), '/approval') === 0 ? 'active' : '' ?>" href="/approval">
                 <i class="bi bi-check2-circle"></i> Persetujuan

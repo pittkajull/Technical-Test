@@ -37,6 +37,10 @@ class Booking extends BaseController
             return redirect()->to('/auth');
         }
 
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Hanya admin yang bisa melihat daftar pemesanan');
+        }
+
         $bookings = $this->bookingModel->getBookingsWithDetails();
 
         $data = [
@@ -54,6 +58,10 @@ class Booking extends BaseController
     {
         if (!session()->get('is_logged_in')) {
             return redirect()->to('/auth');
+        }
+
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Hanya admin yang bisa membuat pemesanan');
         }
 
         $vehicles = $this->vehicleModel->getAvailableVehicles();
@@ -77,6 +85,10 @@ class Booking extends BaseController
     {
         if (!session()->get('is_logged_in')) {
             return redirect()->to('/auth');
+        }
+
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Hanya admin yang bisa membuat pemesanan');
         }
 
         // Validate input
@@ -160,6 +172,10 @@ class Booking extends BaseController
             return redirect()->to('/auth');
         }
 
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Hanya admin yang bisa melihat detail pemesanan');
+        }
+
         $booking = $this->bookingModel->getBookingById($id);
 
         if (!$booking) {
@@ -184,6 +200,10 @@ class Booking extends BaseController
     {
         if (!session()->get('is_logged_in')) {
             return redirect()->to('/auth');
+        }
+
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/dashboard')->with('error', 'Hanya admin yang bisa mengubah status pemesanan');
         }
 
         $status = $this->request->getPost('status');
