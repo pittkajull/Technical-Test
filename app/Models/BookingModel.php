@@ -115,7 +115,7 @@ class BookingModel extends Model
                 LEFT JOIN vehicle_types ON vehicle_types.id = vehicles.vehicle_type_id
                 LEFT JOIN drivers ON drivers.id = bookings.driver_id
                 LEFT JOIN users ON users.id = bookings.requester_id
-                WHERE bookings.status = 'pending' 
+                WHERE bookings.status NOT IN ('rejected', 'cancelled', 'completed') 
                 AND booking_approvals.approver_id = " . (int)$approverId . "
                 AND booking_approvals.status = 'pending'";
         return $db->query($sql)->getResult();
@@ -123,6 +123,7 @@ class BookingModel extends Model
 
     /**
      * Get pending bookings for approver level 2
+     * Shows bookings where L2 approval is still pending (regardless of booking status)
      */
     public function getPendingBookingsForLevel2($approverId)
     {
@@ -138,7 +139,7 @@ class BookingModel extends Model
                 LEFT JOIN vehicle_types ON vehicle_types.id = vehicles.vehicle_type_id
                 LEFT JOIN drivers ON drivers.id = bookings.driver_id
                 LEFT JOIN users ON users.id = bookings.requester_id
-                WHERE bookings.status = 'approved_level1' 
+                WHERE bookings.status NOT IN ('rejected', 'cancelled', 'completed') 
                 AND booking_approvals.approver_id = " . (int)$approverId . "
                 AND booking_approvals.status = 'pending'";
         return $db->query($sql)->getResult();

@@ -120,26 +120,38 @@ class Approval extends BaseController
         if ($action === 'approve') {
             $this->approvalModel->updateApprovalStatus($approval->id, 'approved', $notes);
 
-            // Check if level 1 is approved, then update booking status
             if ($level === 1) {
-                $this->bookingModel->update($bookingId, ['status' => 'approved_level1']);
-                
                 $this->logModel->log(
                     $userId,
                     'APPROVE_BOOKING_L1',
                     'Menyetujui pemesanan level 1'
                 );
-            } 
-            // Check if level 2 is approved, then update booking status
-            elseif ($level === 2) {
-                $this->bookingModel->update($bookingId, ['status' => 'approved_level2']);
-                
+            } elseif ($level === 2) {
                 $this->logModel->log(
                     $userId,
                     'APPROVE_BOOKING_L2',
-                    'Menyetujui pemesanan level 2 - Pemesanan disetujui penuh'
+                    'Menyetujui pemesanan level 2'
                 );
             }
+
+            // Check if BOTH levels have approved -> fully approved
+            $l1Approved = $this->approvalModel->hasLevel1Approval($bookingId);
+            $l2Approved = $this->approvalModel->hasLevel2Approval($bookingId);
+
+            if ($l1Approved && $l2Approved) {
+                // Both levels approved -> booking fully approved
+                $this->bookingModel->update($bookingId, ['status' => 'approved_level2']);
+
+                $this->logModel->log(
+                    $userId,
+                    'APPROVE_BOOKING_FULL',
+                    'Pemesanan disetujui penuh oleh kedua level'
+                );
+            } elseif ($level === 1 && !$l2Approved) {
+                // L1 approved but L2 still pending -> mark as approved_level1
+                $this->bookingModel->update($bookingId, ['status' => 'approved_level1']);
+            }
+            // If L2 approved but L1 still pending, keep status as 'pending'
 
             return redirect()->to('/approval')->with('success', 'Pemesanan berhasil disetujui');
             
